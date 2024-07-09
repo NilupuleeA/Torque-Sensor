@@ -1,6 +1,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#define F_CPU 16000000UL
+
 void i2c_init(void) {
   TWSR = 0x00; 
   TWBR = ((F_CPU / 100000UL) - 16) / 2; // Set the TWI frequency to 100kHz
@@ -30,7 +32,7 @@ int main(void) {
   // Loop
   while (1) {
     i2c_start(); 
-    i2c_write(0x88);
+    i2c_write(0x2c << 1);
     i2c_write(0x00); 
     i2c_write(val); // Send potentiometer value byte
     i2c_stop(); 

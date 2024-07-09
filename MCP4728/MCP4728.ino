@@ -1,5 +1,8 @@
-const uint8_t LDAC = PD5; 
-const uint8_t MCP4728_ADDRESS = 0x60; // I2C address of MCP4728
+#include <avr/io.h>
+#include <util/delay.h>
+
+#define F_CPU 16000000UL  
+#define MCP4728_ADDR 0x60 // MCP4728 I2C address
 
 void i2c_init(void) {
   TWSR = 0x00; 
@@ -20,27 +23,29 @@ void i2c_write(uint8_t data) {
   TWDR = data;
   TWCR = (1 << TWINT) | (1 << TWEN); 
   while (!(TWCR & (1 << TWINT)));
-} while (!(TWCR & (1 << TWINT)));
 }
 
-void setup() {
-  DDRD |= (1 << LDAC); // Set LDAC pin (PD7) as output
-  PORTD |= (1 << PD7); // Set LDAC pin high 
+void mcp4728_set_output(uint16_t value) {
+    uint8_t buffer[3];
+    buffer[0] = 0b01011110;           // Command byte for fast write to channel D
+    buffer[1] = (value >> 8) & 0xFF;  // High byte of DAC value
+    buffer[2] = value & 0xFF;         // Low byte of DAC value
 
-  i2c_init(); 
-
-  // Set the DAC output voltage to 0.01V on channel A
-  // Calculate the corresponding 12 bit value for 0.01V
-  uint16_t value = 8; // 0.01V * 4095 / 5V = 8.19 
-
-  i2c_start();
-  i2c_write((MCP4728_ADDRESS << 1) | 0); 
-  i2c_write((0 << 1) | ((value >> 8) & 0x0F)); // Upper 4 bits
-  i2c_write(value & 0xFF); // Lower 8 bits
-  i2c_stop();
+    i2c_start();
+    i2c_write(MCP4728_ADDR << 1);     // Send MCP4728 address with write bit
+    for (uint8_t i = 0; i < 3; i++) {
+        i2c_write(buffer[i]);         // Send control byte and DAC value bytes
+    }
+    i2c_stop();
 }
 
-int main(void){
-  setup();
-  return 0;
+int main(void) {
+    i2c_init();    
+    mcp4728_set_output(512); // Set MCP4728 DAC output to 512
+
+    while (1) {
+        _delay_ms(1000); 
+    }
+    
+    return 0;
 }

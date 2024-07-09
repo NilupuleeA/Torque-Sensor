@@ -1,6 +1,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#define F_CPU 16000000UL
 #define display_ADDRESS 0x3C
 #define display_COMMAND 0x00
 #define display_DATA 0x40
@@ -79,36 +80,34 @@ void display_command(uint8_t command) {
 
 void display_init(void) {
     _delay_ms(100);  
-
-    // Display commands
-    display_command(0xAE); 
-    display_command(0x20);
-    display_command(0x00); 
-    display_command(0xB0); 
+    display_command(0xAE); // Display OFF
+    display_command(0x20); // Set Memory Addressing Mode
+    display_command(0x00); // Horizontal Addressing Mode
+    display_command(0xB0); // Set Page Start Address for Page Addressing Mode
     display_command(0xC8); 
-    display_command(0x00); 
-    display_command(0x10); 
-    display_command(0x40); 
-    display_command(0x81); 
-    display_command(0xFF); 
+    display_command(0x00); // Set low column address
+    display_command(0x10); // Set high column address
+    display_command(0x40); // Set start line address
+    display_command(0x81); // Set contrast control 
+    display_command(0xFF); // Max contrast
     display_command(0xA1); 
-    display_command(0xA6); 
-    display_command(0xA8); 
+    display_command(0xA6); // Set Normal Display
+    display_command(0xA8); // Set Multiplex Ratio
     display_command(0x3F); 
-    display_command(0xA4); 
-    display_command(0xD3); 
-    display_command(0x00); 
+    display_command(0xA4); // Entire Display ON, Output RAM to Display
+    display_command(0xD3); // Set Display Offset
+    display_command(0x00); // No offset
     display_command(0xD5); 
-    display_command(0xF0); 
-    display_command(0xD9);
-    display_command(0x22); 
-    display_command(0xDA);
-    display_command(0x12); 
-    display_command(0xDB); 
+    display_command(0xF0); // Highest frequency
+    display_command(0xD9); // Set Pre-charge Period
+    display_command(0x22); // Pre-charge period
+    display_command(0xDA); // Set COM Pins Hardware Configuration
+    display_command(0x12);
+    display_command(0xDB);
     display_command(0x20); 
-    display_command(0x8D); 
-    display_command(0x14); 
-    display_command(0xAF); 
+    display_command(0x8D); // Set Charge Pump
+    display_command(0x14);
+    display_command(0xAF); // Display ON
 }
 
 void display_clear(void) {
@@ -122,7 +121,7 @@ void display_show(void) {
     // Send the display buffer content to the OLED display
     for (uint8_t page = 0; page < 8; page++) {
         display_command(0xB0 + page); 
-        display_command(0x00);         
+        display_command(0x00);      
         display_command(0x10);        
         i2c_start();                   
         i2c_write(display_ADDRESS << 1); 
@@ -147,6 +146,7 @@ void display_draw_pixel(int x, int y, bool color) {
 void DrawCGraph(double x, double y, double gx, double gy, double w, double h, 
 double xlo, double xhi, double xinc, double ylo, double yhi, double yinc, 
 double dig, const char* title, bool& Redraw) {
+
     double i;
     double temp;
 
