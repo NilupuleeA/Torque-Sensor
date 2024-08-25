@@ -41,7 +41,7 @@ void mcp4728_set_output(uint16_t value) {
 
 int main(void) {
     i2c_init();    
-    mcp4728_set_output(512); // Set MCP4728 DAC output to 512
+    mcp4728_set_output(2048); // Set MCP4728 DAC output to 512
 
     while (1) {
         _delay_ms(1000); 
