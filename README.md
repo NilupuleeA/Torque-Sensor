@@ -4,7 +4,10 @@
 
 In our battery-powered setup, we utilize a regulator circuit to maintain stable voltage output, ensuring consistent power supply to both the microcontroller and strain gauges. We selected BD450M5 due to its low dropout voltage, which is typically 0.2V. Its maximum current rating is 0.5A.
 
-![Power](https://github.com/user-attachments/assets/d51e83f2-ea49-449f-943b-da08a0e0aa66)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/d51e83f2-ea49-449f-943b-da08a0e0aa66" alt="Power" width="50%" />
+</p>
+
 
 ## Bridge Balancing Circuit
  
